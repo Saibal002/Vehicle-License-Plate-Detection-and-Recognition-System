@@ -15,9 +15,9 @@ import io
 # --------------------------------
 YOLO_MODEL_PATH = "best.pt"
 CNN_MODEL_PATH = "cnn.keras"
-DETECTED_FOLDER = "D:\WORKSPACE\College Project\YOLO+CNN\detected_regions"
 
-os.makedirs(DETECTED_FOLDER, exist_ok=True)
+
+
 
 # --------------------------------
 # Load models
@@ -51,11 +51,10 @@ def detect_plates(image_np, image_name):
     for i, box in enumerate(boxes):
         x1, y1, x2, y2 = map(int, box)
         crop = image_np[y1:y2, x1:x2]
-        path = os.path.join(DETECTED_FOLDER, f"{image_name}_plate_{i}.jpg")
-        cv2.imwrite(path, crop)
-        plates.append((crop, (x1, y1, x2, y2)))
+        plates.append((crop, (x1, y1, x2, y2)))  # No need to save to disk
 
     return plates, results[0].plot()
+
 
 def enhance_image(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -294,37 +293,37 @@ if option == "Upload Images":
                 st.markdown(f"🌐 Vehicle registered in: `{state}`")
 
 
-elif option == "Live Webcam Detection":
-    stframe = st.empty()
-    cap = cv2.VideoCapture(0)
-    run = st.button("📸 Capture")
+# elif option == "Live Webcam Detection":
+#     stframe = st.empty()
+#     cap = cv2.VideoCapture(0)
+#     run = st.button("📸 Capture")
 
-    if not cap.isOpened():
-        st.error("Could not open webcam.")
-    else:
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                st.error("Webcam read failed.")
-                break
-            frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            stframe.image(frame_rgb, channels="RGB")
-            if run:
-                plates, annotated = detect_plates(frame, "webcam")
-                annotated_rgb = cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB)
-                st.image(annotated_rgb, caption="Detected Plates")
-                for idx, (plate_img, box) in enumerate(plates):
-                    st.markdown(f"#### Plate {idx + 1}")
-                    chars, bboxes, segmented_debug = segment_characters(plate_img)
-                    if not chars:
-                        st.warning("No characters found.")
-                        continue
-                    raw_text, (corrected, state) = predict_plate(chars, bboxes, segmented_debug)
+#     if not cap.isOpened():
+#         st.error("Could not open webcam.")
+#     else:
+#         while True:
+#             ret, frame = cap.read()
+#             if not ret:
+#                 st.error("Webcam read failed.")
+#                 break
+#             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+#             stframe.image(frame_rgb, channels="RGB")
+#             if run:
+#                 plates, annotated = detect_plates(frame, "webcam")
+#                 annotated_rgb = cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB)
+#                 st.image(annotated_rgb, caption="Detected Plates")
+#                 for idx, (plate_img, box) in enumerate(plates):
+#                     st.markdown(f"#### Plate {idx + 1}")
+#                     chars, bboxes, segmented_debug = segment_characters(plate_img)
+#                     if not chars:
+#                         st.warning("No characters found.")
+#                         continue
+#                     raw_text, (corrected, state) = predict_plate(chars, bboxes, segmented_debug)
 
-                    st.markdown(f"**📄 Raw Predicted Text:** `{raw_text}`")
-                    st.markdown(f"**✅ Corrected Text:** `{corrected}`")
-                    st.markdown(f"🌐 Vehicle registered in: `{state}`")
+#                     st.markdown(f"**📄 Raw Predicted Text:** `{raw_text}`")
+#                     st.markdown(f"**✅ Corrected Text:** `{corrected}`")
+#                     st.markdown(f"🌐 Vehicle registered in: `{state}`")
 
-                break
-        cap.release()
+#                 break
+#         cap.release()
 
