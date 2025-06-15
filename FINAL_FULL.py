@@ -13,7 +13,7 @@ import io
 # Config
 # --------------------------------
 YOLO_MODEL_PATH = "best.pt"
-CNN_MODEL_PATH = "D:\WORKSPACE\College Project\YOLO+CNN\cnn.keras"
+CNN_MODEL_PATH = "cnn.keras"
 DETECTED_FOLDER = "D:\WORKSPACE\College Project\YOLO+CNN\detected_regions"
 
 os.makedirs(DETECTED_FOLDER, exist_ok=True)
