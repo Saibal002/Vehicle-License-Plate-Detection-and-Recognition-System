@@ -14,7 +14,7 @@ import io
 # Config
 # --------------------------------
 YOLO_MODEL_PATH = "best.pt"
-CNN_MODEL_PATH = "cnn.keras"
+CNN_MODEL_PATH = "ocr_model_tf.h5"
 
 
 
