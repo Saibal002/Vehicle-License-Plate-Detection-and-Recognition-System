@@ -2,6 +2,7 @@ import streamlit as st
 import cv2
 import numpy as np
 import os
+os.environ["YOLO_CONFIG_DIR"] = "/tmp"
 from ultralytics import YOLO
 from tensorflow.keras.models import load_model
 from PIL import Image
