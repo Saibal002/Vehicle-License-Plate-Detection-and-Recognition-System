@@ -5,5 +5,5 @@ tensorflow
 Pillow
 numpy
 scikit-image
-matplotlib.pyplot
+matplotlib
 os
