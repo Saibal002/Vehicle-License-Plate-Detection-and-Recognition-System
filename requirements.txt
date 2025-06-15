@@ -1,0 +1,9 @@
+streamlit
+opencv-python
+ultralytics
+tensorflow             
+Pillow
+numpy
+scikit-image
+matplotlib.pyplot
+os
