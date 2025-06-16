@@ -19,7 +19,7 @@ YOLO_MODEL_PATH = "best.pt"
 OCR_MODEL_PATH_PT = "ocr_cnn_model.pt"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 ocr_model = torch.load(OCR_MODEL_PATH_PT, map_location=device)
-ocr_model.eval()
+
 
 
 
