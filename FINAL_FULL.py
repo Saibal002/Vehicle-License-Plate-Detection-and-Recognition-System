@@ -26,46 +26,27 @@ char_to_int = {char: i for i, char in enumerate(CHARACTERS)}
 int_to_char = {i: char for char, i in char_to_int.items()}
 num_classes = len(CHARACTERS)
 
-# # --------------------------------
-# # Model class definition
-# # --------------------------------
-# class OCRModel(nn.Module):
-#     def __init__(self, num_classes):
-#         super(OCRModel, self).__init__()
-#         self.conv1 = nn.Conv2d(1, 32, kernel_size=3)
-#         self.bn1 = nn.BatchNorm2d(32)
-#         self.pool1 = nn.MaxPool2d(2)
-#         self.drop1 = nn.Dropout(0.3)
+# Define the OCR model architecture (must match the saved model)
+class SimpleCNN(nn.Module):
+    def __init__(self, num_classes=36):
+        super(SimpleCNN, self).__init__()
+        self.conv1 = nn.Conv2d(1, 32, kernel_size=3, padding=1)
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        self.pool = nn.MaxPool2d(2, 2)
+        self.fc1 = nn.Linear(64 * 8 * 8, 128)
+        self.fc2 = nn.Linear(128, num_classes)
 
-#         self.conv2 = nn.Conv2d(32, 64, kernel_size=3)
-#         self.bn2 = nn.BatchNorm2d(64)
-#         self.pool2 = nn.MaxPool2d(2)
-#         self.drop2 = nn.Dropout(0.3)
+    def forward(self, x):
+        x = self.pool(F.relu(self.conv1(x)))  # (32, 16, 16)
+        x = self.pool(F.relu(self.conv2(x)))  # (64, 8, 8)
+        x = x.view(-1, 64 * 8 * 8)
+        x = F.relu(self.fc1(x))
+        x = self.fc2(x)
+        return x
 
-#         self._to_linear = self._get_flattened_size()
-#         self.fc1 = nn.Linear(self._to_linear, 128)
-#         self.drop3 = nn.Dropout(0.5)
-#         self.fc2 = nn.Linear(128, num_classes)
-
-#     def _get_flattened_size(self):
-#         x = torch.zeros(1, 1, 32, 32)
-#         x = self.pool1(F.relu(self.bn1(self.conv1(x))))
-#         x = self.pool2(F.relu(self.bn2(self.conv2(x))))
-#         return x.view(1, -1).size(1)
-
-#     def forward(self, x):
-#         x = self.pool1(F.relu(self.bn1(self.conv1(x))))
-#         x = self.drop1(x)
-#         x = self.pool2(F.relu(self.bn2(self.conv2(x))))
-#         x = self.drop2(x)
-#         x = x.view(x.size(0), -1)
-#         x = F.relu(self.fc1(x))
-#         x = self.drop3(x)
-#         return F.log_softmax(self.fc2(x), dim=1)
-
-# Instantiate and load the model
-# Load the OCR model directly
-ocr_model = torch.load(OCR_MODEL_PATH_PT, map_location=torch.device('cpu'))
+# Instantiate and load the OCR model
+ocr_model = SimpleCNN(num_classes=num_classes).to(device)
+ocr_model.load_state_dict(torch.load(OCR_MODEL_PATH_PT, map_location=device))
 ocr_model.eval()
 
 
