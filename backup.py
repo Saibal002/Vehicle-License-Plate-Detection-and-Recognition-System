@@ -143,7 +143,7 @@ def predict_plate(chars, bboxes, plate_img):
         x, y, w, h = bbox
         cv2.rectangle(debug_img, (x, y), (x + w, y + h), (0, 255, 0), 2)
         cv2.putText(debug_img, label, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
-
+    
     show_image("Final Prediction", debug_img, cmap=None)
     corrected_prediction = correct_plate_text(prediction)
     return prediction, corrected_prediction
