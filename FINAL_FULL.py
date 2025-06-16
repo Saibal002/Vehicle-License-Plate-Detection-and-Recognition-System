@@ -17,7 +17,7 @@ import string
 # Config
 # --------------------------------
 YOLO_MODEL_PATH = "best.pt"
-OCR_MODEL_PATH_PT = "ocr_cnn_model.pth"
+OCR_MODEL_PATH_PT = "ocr_cnn_model.pt"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Character set
