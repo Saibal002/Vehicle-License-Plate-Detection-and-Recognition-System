@@ -27,7 +27,7 @@ ocr_model = torch.load(OCR_MODEL_PATH_PT, map_location=device)
 # Load models
 # --------------------------------
 yolo_model = YOLO(YOLO_MODEL_PATH)
-ocr_model = load_model(OCR_MODEL_PATH_PT)
+
 
 CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 char_to_int = {char: i for i, char in enumerate(CHARACTERS)}
