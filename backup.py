@@ -4,72 +4,28 @@ import numpy as np
 import os
 os.environ["YOLO_CONFIG_DIR"] = "/tmp"
 from ultralytics import YOLO
+#from tensorflow.keras.models import load_model
 from PIL import Image
 import tempfile
 import matplotlib.pyplot as plt
 import io
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import string
 
 # --------------------------------
 # Config
 # --------------------------------
 YOLO_MODEL_PATH = "best.pt"
-OCR_MODEL_PATH_PT = "ocr_model.pth"
+# CNN_MODEL_PATH = "ocr_model_tf.h5"
+OCR_MODEL_PATH_PT = "ocr_cnn_model.pt"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+ocr_model = torch.load(OCR_MODEL_PATH_PT, map_location=device)
 
-# Character set
-CHARACTERS = list(string.digits + string.ascii_uppercase)
-char_to_int = {char: i for i, char in enumerate(CHARACTERS)}
-int_to_char = {i: char for char, i in char_to_int.items()}
-num_classes = len(CHARACTERS)
+
+
 
 # --------------------------------
-# Model class definition
+# Load models
 # --------------------------------
-class OCRModel(nn.Module):
-    def __init__(self, num_classes):
-        super(OCRModel, self).__init__()
-        self.conv1 = nn.Conv2d(1, 32, kernel_size=3)
-        self.bn1 = nn.BatchNorm2d(32)
-        self.pool1 = nn.MaxPool2d(2)
-        self.drop1 = nn.Dropout(0.3)
-
-        self.conv2 = nn.Conv2d(32, 64, kernel_size=3)
-        self.bn2 = nn.BatchNorm2d(64)
-        self.pool2 = nn.MaxPool2d(2)
-        self.drop2 = nn.Dropout(0.3)
-
-        self._to_linear = self._get_flattened_size()
-        self.fc1 = nn.Linear(self._to_linear, 128)
-        self.drop3 = nn.Dropout(0.5)
-        self.fc2 = nn.Linear(128, num_classes)
-
-    def _get_flattened_size(self):
-        x = torch.zeros(1, 1, 32, 32)
-        x = self.pool1(F.relu(self.bn1(self.conv1(x))))
-        x = self.pool2(F.relu(self.bn2(self.conv2(x))))
-        return x.view(1, -1).size(1)
-
-    def forward(self, x):
-        x = self.pool1(F.relu(self.bn1(self.conv1(x))))
-        x = self.drop1(x)
-        x = self.pool2(F.relu(self.bn2(self.conv2(x))))
-        x = self.drop2(x)
-        x = x.view(x.size(0), -1)
-        x = F.relu(self.fc1(x))
-        x = self.drop3(x)
-        return F.log_softmax(self.fc2(x), dim=1)
-
-# Instantiate and load the model
-ocr_model = OCRModel(num_classes)
-ocr_model.load_state_dict(torch.load(OCR_MODEL_PATH_PT, map_location=device))
-ocr_model.to(device)
-ocr_model.eval()
-
-# Load YOLO model
 yolo_model = YOLO(YOLO_MODEL_PATH)
 
 
@@ -315,7 +271,54 @@ def correct_plate_text(pred):
 
 #     corrected_prediction = correct_plate_text(prediction)
 #     return prediction, corrected_prediction
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
 
+# Character set
+import string
+characters = list(string.digits + string.ascii_uppercase)
+num_classes = len(characters)
+
+# Recreate the model class
+class OCRModel(nn.Module):
+    def __init__(self, num_classes):
+        super(OCRModel, self).__init__()
+        self.conv1 = nn.Conv2d(1, 32, kernel_size=3)
+        self.bn1 = nn.BatchNorm2d(32)
+        self.pool1 = nn.MaxPool2d(2)
+        self.drop1 = nn.Dropout(0.3)
+
+        self.conv2 = nn.Conv2d(32, 64, kernel_size=3)
+        self.bn2 = nn.BatchNorm2d(64)
+        self.pool2 = nn.MaxPool2d(2)
+        self.drop2 = nn.Dropout(0.3)
+
+        self._to_linear = self._get_flattened_size()
+        self.fc1 = nn.Linear(self._to_linear, 128)
+        self.drop3 = nn.Dropout(0.5)
+        self.fc2 = nn.Linear(128, num_classes)
+
+    def _get_flattened_size(self):
+        x = torch.zeros(1, 1, 32, 32)
+        x = self.pool1(F.relu(self.bn1(self.conv1(x))))
+        x = self.pool2(F.relu(self.bn2(self.conv2(x))))
+        return x.view(1, -1).size(1)
+
+    def forward(self, x):
+        x = self.pool1(F.relu(self.bn1(self.conv1(x))))
+        x = self.drop1(x)
+        x = self.pool2(F.relu(self.bn2(self.conv2(x))))
+        x = self.drop2(x)
+        x = x.view(x.size(0), -1)
+        x = F.relu(self.fc1(x))
+        x = self.drop3(x)
+        return F.log_softmax(self.fc2(x), dim=1)
+
+# Instantiate and load weights
+ocr_model = OCRModel(num_classes)
+ocr_model.load_state_dict(torch.load("ocr_model.pth", map_location="cpu"))
+ocr_model.eval()
 
 
 #===============================TORCH+++++++++++++
