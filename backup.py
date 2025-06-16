@@ -12,13 +12,13 @@ import io
 # Configuration
 # -------------------------------
 YOLO_MODEL_PATH = "best.pt"
-CNN_MODEL_PATH = "ocr_model.pth"
+cnn_model = "ocr_model.pth"
 
 # -------------------------------
 # Load Models
 # -------------------------------
 yolo_model = YOLO(YOLO_MODEL_PATH)
-cnn_model = load_model(CNN_MODEL_PATH)
+# cnn_model = load_model(CNN_MODEL_PATH)
 
 CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 char_to_int = {char: i for i, char in enumerate(CHARACTERS)}
