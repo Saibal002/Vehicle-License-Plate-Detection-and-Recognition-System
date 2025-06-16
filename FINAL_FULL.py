@@ -17,7 +17,7 @@ import string
 # Config
 # --------------------------------
 YOLO_MODEL_PATH = "best.pt"
-OCR_MODEL_PATH_PT = "ocr_model.pth"
+OCR_MODEL_PATH_PT = "ocr_cnn_model.pth"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Character set
@@ -174,14 +174,7 @@ def segment_characters(image):
     char_imgs = [item[1] for item in sorted_chars]
 
     return char_imgs, bboxes, debug
-#for keras...............
-# def pad_and_prepare(img):
-#     img = img.astype("float32") / 255.0
-#     img = np.expand_dims(img, axis=-1)
-#     img = np.expand_dims(img, axis=0)
-#     return img
 
-#for torch
 def pad_and_prepare(img):
     img = img.astype("float32") / 255.0
     img = np.expand_dims(img, axis=0)  # (1, H, W)
@@ -299,26 +292,7 @@ def correct_plate_text(pred):
 
     return corrected, state_name
 
-# def predict_plate(chars, bboxes, plate_img):
-#     prediction = ""
-#     debug_img = plate_img.copy()
-#     for char_img, bbox in zip(chars, bboxes):
-#         proc = pad_and_prepare(char_img)
-#         pred = ocr_model.predict(proc, verbose=0)
-#         label = int_to_char[np.argmax(pred)]
-#         prediction += label
-#         x, y, w, h = bbox
-#         cv2.rectangle(debug_img, (x, y), (x + w, y + h), (0, 255, 0), 2)
-#         cv2.putText(debug_img, label, (x, y - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
-    
-#     show_image("Final Prediction", debug_img, cmap=None)
 
-#     corrected_prediction = correct_plate_text(prediction)
-#     return prediction, corrected_prediction
-
-
-
-#===============================TORCH+++++++++++++
 def predict_plate(chars, bboxes, plate_img):
     prediction = ""
     debug_img = plate_img.copy()
@@ -369,39 +343,4 @@ if option == "Upload Images":
                 st.markdown(f"**📄 Raw Predicted Text:** `{raw_text}`")
                 st.markdown(f"**✅ Corrected Text:** `{corrected}`")
                 st.markdown(f"🌐 Vehicle registered in: `{state}`")
-
-
-# elif option == "Live Webcam Detection":
-#     stframe = st.empty()
-#     cap = cv2.VideoCapture(0)
-#     run = st.button("📸 Capture")
-
-#     if not cap.isOpened():
-#         st.error("Could not open webcam.")
-#     else:
-#         while True:
-#             ret, frame = cap.read()
-#             if not ret:
-#                 st.error("Webcam read failed.")
-#                 break
-#             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-#             stframe.image(frame_rgb, channels="RGB")
-#             if run:
-#                 plates, annotated = detect_plates(frame, "webcam")
-#                 annotated_rgb = cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB)
-#                 st.image(annotated_rgb, caption="Detected Plates")
-#                 for idx, (plate_img, box) in enumerate(plates):
-#                     st.markdown(f"#### Plate {idx + 1}")
-#                     chars, bboxes, segmented_debug = segment_characters(plate_img)
-#                     if not chars:
-#                         st.warning("No characters found.")
-#                         continue
-#                     raw_text, (corrected, state) = predict_plate(chars, bboxes, segmented_debug)
-
-#                     st.markdown(f"**📄 Raw Predicted Text:** `{raw_text}`")
-#                     st.markdown(f"**✅ Corrected Text:** `{corrected}`")
-#                     st.markdown(f"🌐 Vehicle registered in: `{state}`")
-
-#                 break
-#         cap.release()
 
