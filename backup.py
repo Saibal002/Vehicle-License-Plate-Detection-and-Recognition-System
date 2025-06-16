@@ -12,7 +12,7 @@ import io
 # Configuration
 # -------------------------------
 YOLO_MODEL_PATH = "models/best.pt"
-CNN_MODEL_PATH = "models/cnn.keras"
+CNN_MODEL_PATH = "models/ocr_model_tf.h5"
 
 # -------------------------------
 # Load Models
