@@ -11,8 +11,8 @@ import io
 # -------------------------------
 # Configuration
 # -------------------------------
-YOLO_MODEL_PATH = "best.pt"
-CNN_MODEL_PATH = "cnn.keras"
+YOLO_MODEL_PATH = "/models/best.pt"
+CNN_MODEL_PATH = "/models/cnn.keras"
 
 # -------------------------------
 # Load Models
