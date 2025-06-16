@@ -17,7 +17,7 @@ import string
 # Config
 # --------------------------------
 YOLO_MODEL_PATH = "best.pt"
-OCR_MODEL_PATH_PT = "ocr_cnn_model.pt"
+OCR_MODEL_PATH_PT = "ocr_model.pth"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Character set
@@ -26,7 +26,7 @@ char_to_int = {char: i for i, char in enumerate(CHARACTERS)}
 int_to_char = {i: char for char, i in char_to_int.items()}
 num_classes = len(CHARACTERS)
 
-# Define the OCR model architecture (must match the saved model)
+# Define the OCR model architecture (must match the saved model)# Define your model class (must match the training model)
 class SimpleCNN(nn.Module):
     def __init__(self, num_classes=36):
         super(SimpleCNN, self).__init__()
@@ -44,10 +44,11 @@ class SimpleCNN(nn.Module):
         x = self.fc2(x)
         return x
 
-# Instantiate and load the OCR model
-ocr_model = SimpleCNN(num_classes=num_classes).to(device)
-ocr_model.load_state_dict(torch.load(OCR_MODEL_PATH_PT, map_location=device))
+# Load the weights into a new model instance
+ocr_model = SimpleCNN(num_classes=36).to(device)
+ocr_model.load_state_dict(torch.load("ocr_model.pth", map_location=device))
 ocr_model.eval()
+
 
 
 # Load YOLO model
