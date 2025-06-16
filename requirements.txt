@@ -6,4 +6,3 @@ ultralytics
 matplotlib
 Pillow
 streamlit
-tensorflow.keras.models
